@@ -11,10 +11,14 @@
     "dev": "concurrently \"npm run dev --workspace server\" \"npm run dev --workspace client\"",
     "dev:client": "npm run dev --workspace client",
     "dev:server": "npm run dev --workspace server",
+    "start": "npm run start --workspace server",
     "build": "npm run build --workspace client && npm run build --workspace server",
+    "build:server": "npm run db:generate --workspace server && npm run build --workspace server",
     "lint": "npm run lint --workspace client && npm run lint --workspace server",
     "check:structure": "node scripts/check-structure.js",
     "db:migrate": "npm run db:migrate --workspace server",
+    "db:generate": "npm run db:generate --workspace server",
+    "db:deploy": "npm run db:deploy --workspace server",
     "db:seed": "npm run db:seed --workspace server"
   },
   "devDependencies": {

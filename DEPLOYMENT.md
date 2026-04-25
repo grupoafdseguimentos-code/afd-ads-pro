@@ -13,8 +13,8 @@
 ## Backend na Railway/Render
 
 1. Criar servico Node apontando para `server`.
-2. Start command: `npm start`.
-3. Build command: `npm run build`.
+2. Start command: `npm run db:deploy && npm start`.
+3. Build command: `npm install && npm run db:generate && npm run build`.
 4. Variaveis:
    - `DATABASE_URL`
    - `JWT_ACCESS_SECRET`
@@ -24,6 +24,25 @@
    - `STRIPE_WEBHOOK_SECRET`
    - `STRIPE_PRICE_PRO_MONTHLY`
    - `STRIPE_PRICE_ELITE_MONTHLY`
+
+### Railway com monorepo
+
+Opção recomendada:
+
+- Backend service: Root Directory `server`
+- Frontend service: Root Directory `client`, preferencialmente na Vercel
+
+Se o Railway estiver apontando para a raiz `afd-ads-pro-saas`, use o `railway.json` da raiz. Ele roda o backend via workspaces:
+
+- Build: `npm install && npm run db:generate && npm run build --workspace server`
+- Start: `npm run db:deploy && npm start`
+
+Erros comuns:
+
+- `Missing script: start`: Railway apontou para a raiz sem script `start`.
+- `Could not find Prisma schema`: build rodou fora de `server`.
+- `DATABASE_URL required`: variavel do Postgres nao foi conectada ao servico.
+- Healthcheck falhando: API nao subiu ou `PORT` nao foi respeitado.
 
 ## Banco PostgreSQL
 
