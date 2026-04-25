@@ -1,0 +1,21 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: afd-ads-pro-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: afd_ads_pro
+    ports:
+      - "5432:5432"
+    volumes:
+      - afd_ads_pro_pg:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d afd_ads_pro"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  afd_ads_pro_pg:
