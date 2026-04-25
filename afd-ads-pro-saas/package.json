@@ -1,0 +1,23 @@
+{
+  "name": "afd-ads-pro-saas",
+  "version": "1.0.0",
+  "private": true,
+  "description": "A.F.D Ads Pro SaaS - plataforma multiusuario de analytics e monetizacao para Shopee Ads.",
+  "workspaces": [
+    "client",
+    "server"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev --workspace server\" \"npm run dev --workspace client\"",
+    "dev:client": "npm run dev --workspace client",
+    "dev:server": "npm run dev --workspace server",
+    "build": "npm run build --workspace client && npm run build --workspace server",
+    "lint": "npm run lint --workspace client && npm run lint --workspace server",
+    "check:structure": "node scripts/check-structure.js",
+    "db:migrate": "npm run db:migrate --workspace server",
+    "db:seed": "npm run db:seed --workspace server"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0"
+  }
+}
