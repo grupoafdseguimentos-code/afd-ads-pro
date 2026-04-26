@@ -10,7 +10,7 @@ import { userRoutes } from './modules/users/users.routes.js';
 export const routes = Router();
 
 routes.get('/health', (req, res) => {
-  res.json({ ok: true, product: 'A.F.D Ads Pro' });
+  res.status(200).send('ok');
 });
 
 routes.use('/auth', authRoutes);

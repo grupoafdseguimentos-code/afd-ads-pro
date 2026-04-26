@@ -16,6 +16,16 @@ export function AuthProvider({ children }) {
       .finally(() => setLoading(false));
   }, []);
 
+  useEffect(() => {
+    function handleSessionExpired() {
+      tokenStore.clear();
+      setUser(null);
+    }
+
+    window.addEventListener('afd-auth-session-expired', handleSessionExpired);
+    return () => window.removeEventListener('afd-auth-session-expired', handleSessionExpired);
+  }, []);
+
   const value = useMemo(() => ({
     user,
     loading,

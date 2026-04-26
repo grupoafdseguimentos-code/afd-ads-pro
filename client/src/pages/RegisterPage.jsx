@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
+import { getApiErrorMessage } from '../services/api.js';
 
 export function RegisterPage() {
   const { register } = useAuth();
@@ -14,8 +15,8 @@ export function RegisterPage() {
     try {
       await register(form);
       navigate('/onboarding');
-    } catch {
-      setError('Nao foi possivel criar a conta.');
+    } catch (err) {
+      setError(getApiErrorMessage(err, 'Nao foi possivel criar a conta.'));
     }
   }
 

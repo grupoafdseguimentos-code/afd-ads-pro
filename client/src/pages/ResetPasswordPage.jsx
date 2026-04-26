@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { api } from '../services/api.js';
+import { api, getApiErrorMessage } from '../services/api.js';
 
 export function ResetPasswordPage() {
   const [params] = useSearchParams();
@@ -14,9 +14,9 @@ export function ResetPasswordPage() {
     setError('');
     try {
       await api.post('/auth/reset-password', form);
-      setMessage('Senha atualizada. Você já pode entrar.');
-    } catch {
-      setError('Token inválido ou expirado.');
+      setMessage('Senha atualizada. Voce ja pode entrar.');
+    } catch (err) {
+      setError(getApiErrorMessage(err, 'Token invalido ou expirado.'));
     }
   }
 
@@ -25,7 +25,7 @@ export function ResetPasswordPage() {
       <h2 className="text-3xl font-black">Nova senha</h2>
       <p className="mt-2 text-sm text-slate-500">Cole o token recebido e defina uma nova senha.</p>
       <div className="mt-6 grid gap-4">
-        <input className="input" placeholder="Token de recuperação" value={form.token} onChange={event => setForm({ ...form, token: event.target.value })} />
+        <input className="input" placeholder="Token de recuperacao" value={form.token} onChange={event => setForm({ ...form, token: event.target.value })} />
         <input className="input" type="password" placeholder="Nova senha" value={form.password} onChange={event => setForm({ ...form, password: event.target.value })} />
       </div>
       {message && <p className="mt-4 rounded-lg bg-emerald-50 p-3 text-sm font-bold text-emerald-700">{message}</p>}

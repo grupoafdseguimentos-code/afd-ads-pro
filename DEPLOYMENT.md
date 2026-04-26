@@ -7,19 +7,21 @@
 3. Build command: `npm run build`.
 4. Output directory: `dist`.
 5. Variaveis:
-   - `VITE_API_URL=https://api.seu-dominio.com/api`
+   - `VITE_API_URL=https://seu-backend.up.railway.app`
    - `VITE_STRIPE_PUBLIC_KEY=pk_live_...`
 
 ## Backend na Railway/Render
 
 1. Criar servico Node apontando para `server`.
-2. Start command: `npm run db:deploy && npm start`.
+2. Start command: `npm start`.
 3. Build command: `npm install && npm run db:generate && npm run build`.
 4. Variaveis:
+   - `NODE_ENV=production`
    - `DATABASE_URL`
    - `JWT_ACCESS_SECRET`
    - `JWT_REFRESH_SECRET`
-   - `CLIENT_URL`
+   - `CLIENT_URL=https://seu-frontend.vercel.app`
+   - `API_URL=https://seu-backend.up.railway.app`
    - `STRIPE_SECRET_KEY`
    - `STRIPE_WEBHOOK_SECRET`
    - `STRIPE_PRICE_PRO_MONTHLY`
@@ -32,10 +34,29 @@ Opção recomendada:
 - Backend service: Root Directory `server`
 - Frontend service: Root Directory `client`, preferencialmente na Vercel
 
+Depois do deploy do backend, gere o dominio publico no Railway:
+
+```txt
+Settings -> Networking -> Public Networking -> Generate Domain
+```
+
+A URL final fica parecida com:
+
+```txt
+https://afd-ads-pro-production.up.railway.app
+```
+
+Teste no navegador:
+
+```txt
+https://afd-ads-pro-production.up.railway.app/api/health
+https://afd-ads-pro-production.up.railway.app/api/ready
+```
+
 Se o Railway estiver apontando para a raiz `afd-ads-pro-saas`, use o `railway.json` da raiz. Ele roda o backend via workspaces:
 
 - Build: `npm install && npm run db:generate && npm run build --workspace server`
-- Start: `npm run db:deploy && npm start`
+- Start: `npm start`
 
 Erros comuns:
 
@@ -58,6 +79,8 @@ Depois de configurar `DATABASE_URL`:
 npx prisma migrate deploy
 npx prisma db seed
 ```
+
+No Railway, rode migrations como comando separado ou deploy job depois que o banco estiver conectado. O start principal nao roda migration para nao bloquear o healthcheck nem a geracao do dominio.
 
 ## Stripe
 

@@ -1,20 +1,27 @@
+import { useState } from 'react';
 import { CheckCircle2 } from 'lucide-react';
-import { api } from '../services/api.js';
+import { api, getApiErrorMessage } from '../services/api.js';
 import { useAuth } from '../context/AuthContext.jsx';
 
 const plans = [
-  { key: 'FREE', price: 'R$0', title: 'Free', features: ['3 anúncios', 'Métricas básicas', 'Dashboard inicial'] },
-  { key: 'PRO', price: 'R$49/mês', title: 'Pro', features: ['Anúncios ilimitados', 'Métricas completas', 'Dashboard avançado'] },
-  { key: 'ELITE', price: 'R$297/mês', title: 'Elite', features: ['Tudo liberado', 'Prioridade', 'Automações futuras'] }
+  { key: 'FREE', price: 'R$0', title: 'Free', features: ['3 anuncios', 'Metricas basicas', 'Dashboard inicial'] },
+  { key: 'PRO', price: 'R$49/mes', title: 'Pro', features: ['Anuncios ilimitados', 'Metricas completas', 'Dashboard avancado'] },
+  { key: 'ELITE', price: 'R$297/mes', title: 'Elite', features: ['Tudo liberado', 'Prioridade', 'Automacoes futuras'] }
 ];
 
 export function BillingPage() {
   const { user } = useAuth();
+  const [error, setError] = useState('');
 
   async function checkout(plan) {
     if (plan === 'FREE') return;
-    const { data } = await api.post('/billing/checkout', { plan });
-    window.location.href = data.url;
+    setError('');
+    try {
+      const { data } = await api.post('/billing/checkout', { plan });
+      window.location.href = data.url;
+    } catch (err) {
+      setError(getApiErrorMessage(err, 'Nao foi possivel iniciar o checkout.'));
+    }
   }
 
   return (
@@ -24,6 +31,7 @@ export function BillingPage() {
           <p className="text-xs font-black uppercase tracking-widest text-redline">Assinatura</p>
           <h2 className="mt-1 text-2xl font-black">Plano atual: {user?.plan}</h2>
           <p className="mt-2 text-sm text-slate-500">Stripe ativa e cancela planos automaticamente via webhook.</p>
+          {error && <p className="mt-4 rounded-lg bg-red-50 p-3 text-sm font-bold text-redline">{error}</p>}
         </div>
       </div>
 

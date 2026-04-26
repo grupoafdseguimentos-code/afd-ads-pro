@@ -16,6 +16,7 @@
     "build:server": "npm run db:generate --workspace server && npm run build --workspace server",
     "lint": "npm run lint --workspace client && npm run lint --workspace server",
     "check:structure": "node scripts/check-structure.js",
+    "validate:prod": "node scripts/validate-production.js",
     "db:migrate": "npm run db:migrate --workspace server",
     "db:generate": "npm run db:generate --workspace server",
     "db:deploy": "npm run db:deploy --workspace server",

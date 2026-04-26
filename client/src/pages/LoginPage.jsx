@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
+import { getApiErrorMessage } from '../services/api.js';
 
 export function LoginPage() {
   const { login } = useAuth();
@@ -14,8 +15,8 @@ export function LoginPage() {
     try {
       await login(form);
       navigate('/');
-    } catch {
-      setError('Nao foi possivel entrar. Confira email e senha.');
+    } catch (err) {
+      setError(getApiErrorMessage(err, 'Nao foi possivel entrar. Confira email e senha.'));
     }
   }
 
