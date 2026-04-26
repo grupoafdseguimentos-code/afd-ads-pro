@@ -16,16 +16,24 @@ app.get('/api/health', (req, res) => {
 
 app.get('/api/ready', async (req, res) => {
   try {
-    const { checkDatabase } = await import('./config/prisma.js');
-    const database = await checkDatabase();
+    const { getDatabaseStatus } = await import('./config/prisma.js');
+    const database = await getDatabaseStatus();
 
-    return res.status(database ? 200 : 503).json({
-      status: database ? 'ok' : 'unavailable',
-      database: database ? 'connected' : 'unavailable'
+    return res.status(database.ok ? 200 : 503).json({
+      status: database.ok ? 'ok' : 'unavailable',
+      database: database.ok ? 'connected' : 'unavailable',
+      code: database.code,
+      message: database.message,
+      target: database.target
     });
   } catch (error) {
     console.error('Readiness check failed:', error.message);
-    return res.status(503).json({ status: 'unavailable', database: 'unavailable' });
+    return res.status(503).json({
+      status: 'unavailable',
+      database: 'unavailable',
+      code: 'READY_CHECK_FAILED',
+      message: 'Falha ao testar o banco.'
+    });
   }
 });
 

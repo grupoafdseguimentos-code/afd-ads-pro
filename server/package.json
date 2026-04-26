@@ -10,9 +10,11 @@
     "build": "node scripts/check-syntax.js",
     "lint": "node --check src/server.js",
     "db:migrate": "prisma migrate dev",
-    "db:deploy": "node scripts/deploy-migrations.js",
+    "db:deploy": "prisma migrate deploy",
+    "db:deploy:safe": "node scripts/deploy-migrations.js",
     "db:deploy:strict": "prisma migrate deploy",
     "db:generate": "prisma generate",
+    "db:check": "node scripts/check-db.js",
     "db:seed": "node prisma/seed.js"
   },
   "dependencies": {

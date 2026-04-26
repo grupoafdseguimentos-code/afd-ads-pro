@@ -7,9 +7,12 @@ const fallbackDatabaseUrl = 'postgresql://postgres:postgres@localhost:5432/afd_a
 const fallbackAccessSecret = 'afd-ads-pro-access-secret-fallback';
 const fallbackRefreshSecret = 'afd-ads-pro-refresh-secret-fallback';
 const isProduction = process.env.NODE_ENV === 'production';
+const rawDatabaseUrl = process.env.DATABASE_URL || '';
+const rawAccessSecret = process.env.JWT_ACCESS_SECRET || '';
+const rawRefreshSecret = process.env.JWT_REFRESH_SECRET || '';
 
 if (!process.env.PORT) process.env.PORT = '3000';
-if (!process.env.DATABASE_URL) process.env.DATABASE_URL = fallbackDatabaseUrl;
+if (!process.env.DATABASE_URL && !isProduction) process.env.DATABASE_URL = fallbackDatabaseUrl;
 if (!process.env.JWT_ACCESS_SECRET) process.env.JWT_ACCESS_SECRET = fallbackAccessSecret;
 if (!process.env.JWT_REFRESH_SECRET) process.env.JWT_REFRESH_SECRET = fallbackRefreshSecret;
 
@@ -57,9 +60,17 @@ export const env = result.success ? result.data : {
   STRIPE_PRICE_ELITE_MONTHLY: process.env.STRIPE_PRICE_ELITE_MONTHLY || ''
 };
 
+export const envStatus = {
+  databaseUrlConfigured: Boolean(rawDatabaseUrl),
+  accessSecretConfigured: Boolean(rawAccessSecret),
+  refreshSecretConfigured: Boolean(rawRefreshSecret),
+  usingFallbackDatabaseUrl: !isProduction && !rawDatabaseUrl,
+  fallbackDatabaseUrl
+};
+
 if (isProduction) {
   const missing = [];
-  if (env.DATABASE_URL === fallbackDatabaseUrl) missing.push('DATABASE_URL');
+  if (!envStatus.databaseUrlConfigured) missing.push('DATABASE_URL');
   if (env.JWT_ACCESS_SECRET === fallbackAccessSecret) missing.push('JWT_ACCESS_SECRET');
   if (env.JWT_REFRESH_SECRET === fallbackRefreshSecret) missing.push('JWT_REFRESH_SECRET');
 
