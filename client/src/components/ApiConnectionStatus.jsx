@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
 import { AlertTriangle, RefreshCw, Wifi } from 'lucide-react';
 import { API_URL, HAS_API_URL } from '../config.js';
-import { api } from '../services/api.js';
+import { checkApiStatus } from '../services/api.js';
 
 export function ApiConnectionStatus() {
   const [status, setStatus] = useState(HAS_API_URL ? 'checking' : 'missing-config');
+  const [diagnostics, setDiagnostics] = useState(null);
 
   async function checkApi() {
     if (!HAS_API_URL) {
@@ -13,12 +14,9 @@ export function ApiConnectionStatus() {
     }
 
     setStatus('checking');
-    try {
-      await api.get('/health');
-      setStatus('online');
-    } catch {
-      setStatus('offline');
-    }
+    const result = await checkApiStatus();
+    setDiagnostics(result);
+    setStatus(result.online ? 'online' : 'offline');
   }
 
   useEffect(() => {
@@ -46,9 +44,9 @@ export function ApiConnectionStatus() {
               {status === 'checking' ? 'Conectando com a API...' : status === 'missing-config' ? 'URL da API nao configurada' : 'Servidor temporariamente indisponivel'}
             </strong>
             <p className="mt-1 text-xs text-slate-500">
-              {status === 'checking' && `Verificando ${API_URL}/health`}
+              {status === 'checking' && `Verificando ${API_URL}/health e ${API_URL}/ready`}
               {status === 'missing-config' && 'Configure VITE_API_URL na Vercel com a URL publica do Railway.'}
-              {status === 'offline' && 'Nao conseguimos falar com o servidor. O painel continua aberto, mas login, metricas e checkout dependem da API online.'}
+              {status === 'offline' && (diagnostics?.ready?.data?.message || diagnostics?.health?.message || 'Nao conseguimos falar com o servidor. O painel continua aberto, mas login, metricas e checkout dependem da API online.')}
             </p>
           </div>
         </div>

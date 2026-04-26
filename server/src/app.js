@@ -6,6 +6,54 @@ let applicationMounted = false;
 
 app.set('trust proxy', 1);
 
+const fallbackAllowedOrigins = [
+  'https://afd-ads-pro-client.vercel.app'
+];
+
+function getAllowedOrigins() {
+  const configured = [
+    process.env.CLIENT_URL,
+    process.env.FRONTEND_URL,
+    process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : ''
+  ]
+    .filter(Boolean)
+    .flatMap(value => String(value).split(','))
+    .map(value => value.trim().replace(/\/+$/, ''))
+    .filter(Boolean);
+
+  return Array.from(new Set([...fallbackAllowedOrigins, ...configured]));
+}
+
+function isAllowedOrigin(origin) {
+  if (!origin) return true;
+
+  const normalized = String(origin).replace(/\/+$/, '');
+  if (getAllowedOrigins().includes(normalized)) return true;
+
+  return /^https:\/\/afd-ads-pro-client(?:-[a-z0-9-]+)?\.vercel\.app$/i.test(normalized);
+}
+
+function applyCorsHeaders(req, res, next) {
+  const origin = req.headers.origin;
+
+  if (isAllowedOrigin(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin || '*');
+    res.setHeader('Vary', 'Origin');
+  }
+
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,PATCH,DELETE,OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+  if (req.method === 'OPTIONS') {
+    return res.status(204).send();
+  }
+
+  return next();
+}
+
+app.use(applyCorsHeaders);
+
 app.get('/', (req, res) => {
   res.status(200).send('A.F.D Ads Pro API online');
 });
@@ -72,7 +120,7 @@ export async function mountApplication() {
   app.use(helmet());
   app.use(cors({
     origin(origin, callback) {
-      if (!origin || !env.CLIENT_URL || origin === env.CLIENT_URL) {
+      if (isAllowedOrigin(origin)) {
         return callback(null, true);
       }
 
@@ -82,7 +130,9 @@ export async function mountApplication() {
 
       return callback(new Error('Origem nao permitida pelo CORS.'));
     },
-    credentials: true
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
   }));
   app.use(cookieParser());
   app.use(rateLimit({ windowMs: 60 * 1000, max: 180 }));

@@ -3,6 +3,7 @@ console.log('NODE_ENV:', process.env.NODE_ENV);
 console.log('PORT:', process.env.PORT);
 
 const { app, mountApplication } = await import('./app.js');
+const { runMigrationsOnStart } = await import('./config/migrations.js');
 
 const PORT = process.env.PORT || 3000;
 
@@ -10,7 +11,11 @@ const server = app.listen(PORT, '0.0.0.0', () => {
   console.log(`Server running on 0.0.0.0:${PORT}`);
 });
 
-mountApplication()
+runMigrationsOnStart()
+  .catch((error) => {
+    console.error('Prisma migrations failed on start. Application will still mount so diagnostics remain available.', error.message);
+  })
+  .then(() => mountApplication())
   .then(() => {
     console.log('Application routes mounted.');
   })

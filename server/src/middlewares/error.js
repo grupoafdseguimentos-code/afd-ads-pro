@@ -29,14 +29,17 @@ export function errorHandler(error, req, res, next) {
   }
 
   const status = error.status || (databaseError ? 503 : 500);
+  const schemaMissing = ['P2021', 'P2022'].includes(error?.code);
   const payload = {
-    message: databaseError
+    message: schemaMissing
+      ? 'Banco conectado, mas as tabelas ainda nao foram criadas. Rode npm run db:deploy no Railway.'
+      : databaseError
       ? 'Banco de dados temporariamente indisponivel. Verifique a conexao PostgreSQL no Railway.'
       : error.message || 'Erro interno no servidor.'
   };
 
   if (databaseError) {
-    payload.code = 'DATABASE_UNAVAILABLE';
+    payload.code = schemaMissing ? 'DATABASE_SCHEMA_MISSING' : 'DATABASE_UNAVAILABLE';
   }
 
   if (process.env.NODE_ENV !== 'production') {

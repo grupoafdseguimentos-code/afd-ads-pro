@@ -38,8 +38,25 @@ const prisma = new PrismaClient({
 
 try {
   await prisma.$queryRaw`SELECT 1`;
-  console.log('Database connection OK.');
-  process.exitCode = 0;
+  const rows = await prisma.$queryRaw`
+    SELECT table_name
+    FROM information_schema.tables
+    WHERE table_schema = 'public'
+    AND table_name IN ('users', 'refresh_tokens', 'subscriptions', 'ads', 'metrics')
+  `;
+  const found = new Set(rows.map(row => row.table_name));
+  const missing = ['users', 'refresh_tokens', 'subscriptions', 'ads', 'metrics']
+    .filter(table => !found.has(table));
+
+  if (missing.length) {
+    console.error('Database connection OK, but required tables are missing.');
+    console.error(`Missing tables: ${missing.join(', ')}`);
+    console.error('Run `npm run db:deploy` on the Railway server service.');
+    process.exitCode = 1;
+  } else {
+    console.log('Database connection OK.');
+    process.exitCode = 0;
+  }
 } catch (error) {
   console.error('Database connection failed.');
   console.error('Reason:', sanitizeErrorMessage(error.message));

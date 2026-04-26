@@ -6,7 +6,7 @@ import { getApiErrorMessage } from '../services/api.js';
 export function LoginPage() {
   const { login } = useAuth();
   const navigate = useNavigate();
-  const [form, setForm] = useState({ email: 'pro@afdadspro.com', password: 'Pro@123456' });
+  const [form, setForm] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
 
   async function submit(event) {
